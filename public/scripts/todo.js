@@ -80,11 +80,6 @@ var TodoBox = React.createClass({
 
   componentWillMount: function() {
     this.lock = new Auth0Lock('JuyBXARCpO8QsruysCA1uqFFZfOsUUGf', 'makkina.eu.auth0.com');
-
-
-
-
-
     //Auth0
     this.setState({idToken: this.getIdToken()})
 
@@ -96,6 +91,7 @@ var TodoBox = React.createClass({
       if (authHash.id_token) {
         idToken = authHash.id_token
         localStorage.setItem('userToken', authHash.id_token);
+        alert("user token: "+ authHash.id_token);
       }
       if (authHash.error) {
         console.log("Error signing in", authHash);
@@ -111,7 +107,16 @@ var TodoBox = React.createClass({
   firebase: function( profile ){
     if (profile!=null)
        this.firebaseRef = new Firebase('https://todo-react-auth0.firebaseio.com/todos/'+profile.user_id);
-    else return this.firebaseRef;
+
+    this.lock.getDelegationToken(
+         'the_firebase_client_id_from_auth0_dashboard',
+         the_auth0_jwt, {}, function (err, delegationResult) {
+           // this is firebase JWT
+           profile.firebase_token = delegationResult.id_token;
+           store.set('firepad_profile', profile);
+         });
+
+    return this.firebaseRef;
   },
 
   removeItem: function(key) {
@@ -141,18 +146,12 @@ var TodoBox = React.createClass({
     }
   },
 
-  logout: function (e){
-      localStorage.removeItem("userToken");
-      window.location.hash = "";
-      this.setState({idToken: ''});
-  },
-
   render: function() {
 
     if (this.state.idToken) {
           return (
             <div>
-              <LoggedIn lock={this.lock} idToken={this.state.idToken} profileHandler={this.profileHandler}/>
+            <LoggedIn lock={this.lock} idToken={this.state.idToken} profileHandler={this.profileHandler}/>
 
 
               <TodoList todos={ this.state.todos } removeItem={ this.removeItem } />
@@ -161,8 +160,6 @@ var TodoBox = React.createClass({
                 <button>{ 'Add #' + (this.state.todos.length + 1) }</button>
               </form>
 
-              <br/>
-              <a onClick={ this.logout }>Sign Out</a>
             </div>
           );
         } else {
