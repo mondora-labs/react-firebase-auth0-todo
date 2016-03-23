@@ -5,6 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "body-parser": "^1.4.3",
+    "eslint": "^2.4.0",
     "express": "^4.4.5"
   },
   "devDependencies": {},
@@ -27,7 +28,7 @@
     "url": "https://github.com/fmondora/react-firebase-auth0-todo/issues"
   },
   "homepage": "https://github.com/fmondora/react-firebase-auth0-todo",
-  "engines" : {
-    "node" : "0.12.x"
+  "engines": {
+    "node": "0.12.x"
   }
 }
